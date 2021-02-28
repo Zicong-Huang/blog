@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"zicong-huang.github.io","root":"/blog/","scheme":"Muse","version":"8.0.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="特点 数据驱向型，而非模型驱向型算法 不对数据作任何的假设 思想：按相似来归类">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Sklearn机器学习：KNN">
+<meta property="og:url" content="https://zicong-huang.github.io/me.github.io/2021/02/28/ml-sklearn-knn/index.html">
+<meta property="og:site_name" content="ZICONG">
+<meta property="og:description" content="特点 数据驱向型，而非模型驱向型算法 不对数据作任何的假设 思想：按相似来归类">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s3.ax1x.com/2021/02/28/6962VJ.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/02/28/696cb4.png">
+<meta property="article:published_time" content="2021-02-28T05:09:25.000Z">
+<meta property="article:modified_time" content="2021-02-28T05:15:59.876Z">
+<meta property="article:author" content="黄梓聪">
+<meta property="article:tag" content="数据科学">
+<meta property="article:tag" content="机器学习">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="sklearn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s3.ax1x.com/2021/02/28/6962VJ.png">
+
+
+<link rel="canonical" href="https://zicong-huang.github.io/me.github.io/2021/02/28/ml-sklearn-knn/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Sklearn机器学习：KNN | ZICONG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">ZICONG</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">梓聪的个人主页</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%89%B9%E7%82%B9"><span class="nav-number">1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3"><span class="nav-number">2.</span> <span class="nav-text">基本思想</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96"><span class="nav-number">3.</span> <span class="nav-text">依赖</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B7%9D%E7%A6%BB%E5%85%AC%E5%BC%8F"><span class="nav-number">4.</span> <span class="nav-text">距离公式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%80%89%E6%8B%A9K%E5%80%BC"><span class="nav-number">5.</span> <span class="nav-text">选择K值</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%EF%BC%9A%E5%89%B2%E8%8D%89%E6%9C%BA"><span class="nav-number">6.</span> <span class="nav-text">例子：割草机</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E9%9B%86%E5%92%8C%E8%AE%AD%E7%BB%83%E9%9B%86"><span class="nav-number">6.1.</span> <span class="nav-text">测试集和训练集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E6%80%81%E5%8C%96"><span class="nav-number">6.2.</span> <span class="nav-text">正态化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E6%B5%8B%E9%9B%86"><span class="nav-number">6.3.</span> <span class="nav-text">预测集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E8%A7%86%E5%8C%96"><span class="nav-number">6.4.</span> <span class="nav-text">可视化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B1%82%E6%9C%80%E4%BC%98K%E5%80%BC"><span class="nav-number">7.</span> <span class="nav-text">求最优K值</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A2%84%E6%B5%8B"><span class="nav-number">8.</span> <span class="nav-text">预测</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%AF%E8%A7%86%E5%8C%96%EF%BC%9A%E9%A2%84%E6%B5%8B"><span class="nav-number">9.</span> <span class="nav-text">可视化：预测</span></a></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">黄梓聪</p>
+  <div class="site-description" itemprop="description">想法，笔记，以及实验</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/blog/archives">
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/blog/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/blog/tags/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </section>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zicong-huang.github.io/me.github.io/2021/02/28/ml-sklearn-knn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="黄梓聪">
+      <meta itemprop="description" content="想法，笔记，以及实验">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZICONG">
+    </span>
+
+    
+    
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Sklearn机器学习：KNN
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-02-28 00:09:25 / 修改时间：00:15:59" itemprop="dateCreated datePublished" datetime="2021-02-28T00:09:25-05:00">2021-02-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h1><ul>
+<li>数据驱向型，而非模型驱向型算法</li>
+<li>不对数据作任何的假设</li>
+<li>思想：按相似来归类</li>
+</ul>
+<a id="more"></a>
+
+<h1 id="基本思想"><a href="#基本思想" class="headerlink" title="基本思想"></a>基本思想</h1><ul>
+<li>对于某个实例$i$，找到与之邻近的实例</li>
+<li>与之邻近的实例中，归为哪类最多的，该实例就被归为哪一类</li>
+<li>邻近指的是解释变量值的距离接近</li>
+<li>距离有很多计算方法，其中基本的一种是使用欧式距离</li>
+</ul>
+<h1 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">from</span> sklearn <span class="keyword">import</span> preprocessing</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score</span><br><span class="line"><span class="keyword">from</span> sklearn.neighbors <span class="keyword">import</span> NearestNeighbors, KNeighborsClassifier</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">%matplotlib inline</span><br></pre></td></tr></table></figure>
+<h1 id="距离公式"><a href="#距离公式" class="headerlink" title="距离公式"></a>距离公式</h1><ul>
+<li>欧氏距离</li>
+<li>各个解释变量先进行正态化处理</li>
+</ul>
+<h1 id="选择K值"><a href="#选择K值" class="headerlink" title="选择K值"></a>选择K值</h1><p>K 值指的是，每个数据找K个最近近邻，这些最近近邻中属于哪类最多的，当前数据就归为哪类。显然，K值应该为奇数。</p>
+<p>K值选择的标准是在测试集中应该有最小误差。</p>
+<ul>
+<li>低K值能反应局部结构，但是同时也引入了噪音</li>
+<li>高K值减少了噪音，但是无法反映局部结构</li>
+</ul>
+<p>当K=N的时候，等同于数据集中所有数据哪类多就归哪类。这是一种naive benchmark</p>
+<h1 id="例子：割草机"><a href="#例子：割草机" class="headerlink" title="例子：割草机"></a>例子：割草机</h1><h2 id="测试集和训练集"><a href="#测试集和训练集" class="headerlink" title="测试集和训练集"></a>测试集和训练集</h2><p>通过收入<code>Income</code>以及房子面积<code>Lot_size</code>来预测实例是否拥有割草机。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mower_df = pd.read_csv(<span class="string">&#x27;../big_data/datasets/RidingMowers.csv&#x27;</span>)</span><br><span class="line">mower_df[<span class="string">&#x27;Number&#x27;</span>] = mower_df.index + <span class="number">1</span></span><br><span class="line">mower_df.tail()</span><br></pre></td></tr></table></figure>
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+<pre><code>.dataframe tbody tr th &#123;
+    vertical-align: top;
+&#125;
+
+.dataframe thead th &#123;
+    text-align: right;
+&#125;
+</code></pre>
+<p></style></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Income</th>
+      <th>Lot_Size</th>
+      <th>Ownership</th>
+      <th>Number</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>19</th>
+      <td>66.0</td>
+      <td>18.4</td>
+      <td>Nonowner</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>47.4</td>
+      <td>16.4</td>
+      <td>Nonowner</td>
+      <td>21</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>33.0</td>
+      <td>18.8</td>
+      <td>Nonowner</td>
+      <td>22</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>51.0</td>
+      <td>14.0</td>
+      <td>Nonowner</td>
+      <td>23</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>63.0</td>
+      <td>14.8</td>
+      <td>Nonowner</td>
+      <td>24</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+<p>将数据分为训练集和测试集。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">test_frac = <span class="number">0.4</span>      <span class="comment"># 训练集和测试集比例</span></span><br><span class="line">train_data, test_data = train_test_split(mower_df, test_size=test_frac)</span><br></pre></td></tr></table></figure>
+<h2 id="正态化"><a href="#正态化" class="headerlink" title="正态化"></a>正态化</h2><p>下面对相应数据进行正态化处理。存在的问题是，我们只知道训练集的均值和方差，（假装）无法得知测试集的均值和方差。因此我们需要先用训练集去“学习”正态化的变换，再用学到的变换引用于全数据集。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用训练集学习变换</span></span><br><span class="line">scaler = preprocessing.StandardScaler()</span><br><span class="line">scaler.fit(train_data[[<span class="string">&#x27;Income&#x27;</span>, <span class="string">&#x27;Lot_Size&#x27;</span>]])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 对整个数据集需要变换的数据进行变换</span></span><br><span class="line">normalized_cols = scaler.transform(mower_df[[<span class="string">&#x27;Income&#x27;</span>, <span class="string">&#x27;Lot_Size&#x27;</span>]])</span><br><span class="line">normalized_cols = pd.DataFrame(normalized_cols, columns = [<span class="string">&#x27;zIncome&#x27;</span>, <span class="string">&#x27;zLot_Size&#x27;</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 重新组装数据集</span></span><br><span class="line">unchanged_cols = mower_df[[<span class="string">&#x27;Ownership&#x27;</span>, <span class="string">&#x27;Number&#x27;</span>]]</span><br><span class="line">mower_norm = pd.concat([normalized_cols, unchanged_cols], axis=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">mower_norm.head()</span><br></pre></td></tr></table></figure>
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+<pre><code>.dataframe tbody tr th &#123;
+    vertical-align: top;
+&#125;
+
+.dataframe thead th &#123;
+    text-align: right;
+&#125;
+</code></pre>
+<p></style></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>zIncome</th>
+      <th>zLot_Size</th>
+      <th>Ownership</th>
+      <th>Number</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-0.19</td>
+      <td>-0.19</td>
+      <td>Owner</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.08</td>
+      <td>-0.87</td>
+      <td>Owner</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.05</td>
+      <td>1.16</td>
+      <td>Owner</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-0.12</td>
+      <td>0.82</td>
+      <td>Owner</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.16</td>
+      <td>2.01</td>
+      <td>Owner</td>
+      <td>5</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+<p>下面需要重新提取训练集和测试集。在使用<code>train_test_split()</code>的时候，得到的训练集和测试集将包含一个<code>.index</code>属性。使用该属性将得到一个数组，包含着训练集或测试集中各条数据项在原先总数据集中的索引。利用这点可以在转换后的数据集中提取训练集和测试集。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 由于行位置不变，使用原先测试集和训练集的索引来提取测试集和训练集</span></span><br><span class="line">train_norm = mower_norm.iloc[train_data.index]</span><br><span class="line">test_norm = mower_norm.iloc[test_data.index]</span><br></pre></td></tr></table></figure>
+<h2 id="预测集"><a href="#预测集" class="headerlink" title="预测集"></a>预测集</h2><p>生成一个用来预测的数据集。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">predict_df = pd.DataFrame([</span><br><span class="line">    &#123;<span class="string">&#x27;Income&#x27;</span>: <span class="number">60</span>, <span class="string">&#x27;Lot_Size&#x27;</span>: <span class="number">20</span>&#125;,</span><br><span class="line">    &#123;<span class="string">&#x27;Income&#x27;</span>: <span class="number">90</span>, <span class="string">&#x27;Lot_Size&#x27;</span>: <span class="number">22</span>&#125;,</span><br><span class="line">    &#123;<span class="string">&#x27;Income&#x27;</span>: <span class="number">75</span>, <span class="string">&#x27;Lot_Size&#x27;</span>: <span class="number">18</span>&#125;</span><br><span class="line">])</span><br></pre></td></tr></table></figure>
+<h2 id="可视化"><a href="#可视化" class="headerlink" title="可视化"></a>可视化</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">fig1, ax = plt.subplots()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘制训练集</span></span><br><span class="line">subset_owner = train_data[train_data[<span class="string">&#x27;Ownership&#x27;</span>] == <span class="string">&#x27;Owner&#x27;</span>]</span><br><span class="line">subset_nonowner = train_data[train_data[<span class="string">&#x27;Ownership&#x27;</span>] == <span class="string">&#x27;Nonowner&#x27;</span>]</span><br><span class="line">ax.scatter(subset_owner[<span class="string">&#x27;Income&#x27;</span>], subset_owner[<span class="string">&#x27;Lot_Size&#x27;</span>], color=<span class="string">&#x27;r&#x27;</span>, marker=<span class="string">&#x27;o&#x27;</span>, label=<span class="string">&#x27;Owner&#x27;</span>)</span><br><span class="line">ax.scatter(subset_nonowner[<span class="string">&#x27;Income&#x27;</span>], subset_nonowner[<span class="string">&#x27;Lot_Size&#x27;</span>], color=<span class="string">&#x27;b&#x27;</span>, marker=<span class="string">&#x27;o&#x27;</span>, label=<span class="string">&#x27;Nonowner&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘制测试集</span></span><br><span class="line">subset_owner = test_data[test_data[<span class="string">&#x27;Ownership&#x27;</span>] == <span class="string">&#x27;Owner&#x27;</span>]</span><br><span class="line">subset_nonowner = test_data[test_data[<span class="string">&#x27;Ownership&#x27;</span>] == <span class="string">&#x27;Nonowner&#x27;</span>]</span><br><span class="line">ax.scatter(subset_owner[<span class="string">&#x27;Income&#x27;</span>], subset_owner[<span class="string">&#x27;Lot_Size&#x27;</span>], color=<span class="string">&#x27;r&#x27;</span>, marker=<span class="string">&#x27;$t$&#x27;</span>)</span><br><span class="line">ax.scatter(subset_nonowner[<span class="string">&#x27;Income&#x27;</span>], subset_nonowner[<span class="string">&#x27;Lot_Size&#x27;</span>], color=<span class="string">&#x27;b&#x27;</span>, marker=<span class="string">&#x27;$t$&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘制预测集</span></span><br><span class="line">ax.scatter(predict_df[<span class="string">&#x27;Income&#x27;</span>], predict_df[<span class="string">&#x27;Lot_Size&#x27;</span>], color=<span class="string">&#x27;black&#x27;</span>, marker=<span class="string">&#x27;*&#x27;</span>, label=<span class="string">&#x27;Predict&#x27;</span>)</span><br><span class="line"></span><br><span class="line">plt.xlabel(<span class="string">&#x27;Income&#x27;</span>)</span><br><span class="line">plt.ylabel(<span class="string">&#x27;Lot Size&#x27;</span>)</span><br><span class="line">plt.title(<span class="string">&#x27;($t$ to denote test set)&#x27;</span>)</span><br><span class="line">plt.legend()</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/6962VJ"><img src="https://s3.ax1x.com/2021/02/28/6962VJ.png" alt="6962VJ.png"></a></p>
+<h1 id="求最优K值"><a href="#求最优K值" class="headerlink" title="求最优K值"></a>求最优K值</h1><p>求最优K值的方法是找到让测试集accuracy最大化的K。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 初始化训练集和测试集的x和y</span></span><br><span class="line">train_norm_x = train_norm[[<span class="string">&#x27;zIncome&#x27;</span>, <span class="string">&#x27;zLot_Size&#x27;</span>]]</span><br><span class="line">train_norm_y = train_norm[[<span class="string">&#x27;Ownership&#x27;</span>]]</span><br><span class="line"></span><br><span class="line">test_norm_x = test_norm[[<span class="string">&#x27;zIncome&#x27;</span>, <span class="string">&#x27;zLot_Size&#x27;</span>]]</span><br><span class="line">test_norm_y = test_norm[[<span class="string">&#x27;Ownership&#x27;</span>]]</span><br></pre></td></tr></table></figure>
+<p>注意，训练集有14个数据项，因此K的最大取值是15。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">train_norm_x.shape</span><br></pre></td></tr></table></figure>
+
+
+
+<pre><code>(14, 2)
+</code></pre>
+<p>循环K从1到15，训练模型并且获得测试集的accuracy，并把它们存在a list of dict。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 初始化列表用来存储不同K值获得的测试集的accuracy</span></span><br><span class="line">results = []</span><br><span class="line"><span class="comment"># 循环K</span></span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="number">15</span>):</span><br><span class="line">    knn = KNeighborsClassifier(n_neighbors=k)</span><br><span class="line">    knn.fit(train_norm_x, train_norm_y.values.ravel())</span><br><span class="line">    k_test_accuracy = accuracy_score(test_norm_y, knn.predict(test_norm_x))</span><br><span class="line">    </span><br><span class="line">    results.append(&#123;<span class="string">&#x27;k&#x27;</span>:k, <span class="string">&#x27;accuracy&#x27;</span>: k_test_accuracy&#125;)</span><br><span class="line"><span class="comment"># 将list of dicts转换为pd.df</span></span><br><span class="line">results = pd.DataFrame(results)</span><br><span class="line"></span><br><span class="line">results</span><br></pre></td></tr></table></figure>
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+<pre><code>.dataframe tbody tr th &#123;
+    vertical-align: top;
+&#125;
+
+.dataframe thead th &#123;
+    text-align: right;
+&#125;
+</code></pre>
+<p></style></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>k</th>
+      <th>accuracy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>0.3</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>0.3</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>6</td>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>7</td>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>8</td>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>9</td>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>10</td>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>11</td>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>12</td>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>13</td>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>14</td>
+      <td>0.2</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+<p>注意，拟合数据时，<code>y</code>值原本是一列的pd.DataFrame向量，取<code>.values</code>属性获得(14, 1)的<code>np.array</code>向量，再取<code>.ravel()</code>方法获得一个“压扁”的numpy数组。这是该函数所需要传入的。</p>
+<p>可以看到，当K取1，3，5时，accuracy最大。取3似最合适。</p>
+<h1 id="预测"><a href="#预测" class="headerlink" title="预测"></a>预测</h1><p>正态化整个数据集及预测集。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">scaler = preprocessing.StandardScaler()</span><br><span class="line">scaler.fit(mower_df[[<span class="string">&#x27;Income&#x27;</span>, <span class="string">&#x27;Lot_Size&#x27;</span>]])</span><br><span class="line"></span><br><span class="line">mower_norm_x = scaler.transform(mower_df[[<span class="string">&#x27;Income&#x27;</span>, <span class="string">&#x27;Lot_Size&#x27;</span>]])</span><br><span class="line">mower_norm_y = mower_df[[<span class="string">&#x27;Ownership&#x27;</span>]].values.ravel()</span><br><span class="line"></span><br><span class="line">predict_norm_x = scaler.transform(predict_df)</span><br></pre></td></tr></table></figure>
+<p>训练整个数据集：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">knn = KNeighborsClassifier(n_neighbors=<span class="number">3</span>)</span><br><span class="line">knn.fit(mower_norm_x, mower_norm_y)</span><br></pre></td></tr></table></figure>
+
+
+
+<pre><code>KNeighborsClassifier(n_neighbors=3)
+</code></pre>
+<p>找到预测集中每个数据项的三个（k=3）最邻近点，返回其距离和索引。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">distances, indices = knn.kneighbors(predict_norm_x)</span><br><span class="line">print(<span class="string">&quot;Distances: &quot;</span>)</span><br><span class="line">print(distances, <span class="string">&quot;\n&quot;</span>)</span><br><span class="line">print(<span class="string">&quot;Indices: &quot;</span>)</span><br><span class="line">print(indices)</span><br></pre></td></tr></table></figure>
+<pre><code>Distances: 
+[[0.34532669 0.46448259 0.50133206]
+ [0.40791006 0.52801632 0.69065338]
+ [0.49402275 0.49402275 0.62479509]] 
+
+Indices: 
+[[ 3  8 13]
+ [ 7  9  4]
+ [16 19 14]]
+</code></pre>
+<p>预测：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">predictions = knn.predict(predict_norm_x)</span><br><span class="line"><span class="keyword">for</span> index, prediction <span class="keyword">in</span> <span class="built_in">enumerate</span>(predictions):</span><br><span class="line">    print(<span class="number">64</span> * <span class="string">&#x27;-&#x27;</span>)</span><br><span class="line">    print(prediction)                           <span class="comment"># 预测值</span></span><br><span class="line">    print(predict_df.iloc[index])               <span class="comment"># 第index数据项的取值 (index = 0, 1, 2)</span></span><br><span class="line">    print(mower_df.iloc[indices[index,:]])      <span class="comment"># 第index数据项的邻近点的取值</span></span><br><span class="line">    print(mower_norm.iloc[indices[index,:]])    <span class="comment"># 正态化的第index数据项的邻近点的取值</span></span><br></pre></td></tr></table></figure>
+<pre><code>----------------------------------------------------------------
+Owner
+Income      60
+Lot_Size    20
+Name: 0, dtype: int64
+    Income  Lot_Size Ownership  Number
+3     61.5      20.8     Owner       4
+8     69.0      20.0     Owner       9
+13    52.8      20.8  Nonowner      14
+    zIncome  zLot_Size Ownership  Number
+3     -0.12       0.82     Owner       4
+8      0.26       0.49     Owner       9
+13    -0.55       0.82  Nonowner      14
+----------------------------------------------------------------
+Owner
+Income      90
+Lot_Size    22
+Name: 1, dtype: int64
+   Income  Lot_Size Ownership  Number
+7    82.8      22.4     Owner       8
+9    93.0      20.8     Owner      10
+4    87.0      23.6     Owner       5
+   zIncome  zLot_Size Ownership  Number
+7     0.95       1.50     Owner       8
+9     1.46       0.82     Owner      10
+4     1.16       2.01     Owner       5
+----------------------------------------------------------------
+Nonowner
+Income      75
+Lot_Size    18
+Name: 2, dtype: int64
+    Income  Lot_Size Ownership  Number
+16    84.0      17.6  Nonowner      17
+19    66.0      18.4  Nonowner      20
+14    64.8      17.2  Nonowner      15
+    zIncome  zLot_Size Ownership  Number
+16     1.01      -0.53  Nonowner      17
+19     0.11      -0.19  Nonowner      20
+14     0.05      -0.70  Nonowner      15
+</code></pre>
+<h1 id="可视化：预测"><a href="#可视化：预测" class="headerlink" title="可视化：预测"></a>可视化：预测</h1><p>为了画图，将预测结果（<code>np.array</code>）添加到预测集<code>pd.DataFrame</code>中。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">predict_df[<span class="string">&#x27;Ownership&#x27;</span>] = predictions</span><br><span class="line">predict_df</span><br></pre></td></tr></table></figure>
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+<pre><code>.dataframe tbody tr th &#123;
+    vertical-align: top;
+&#125;
+
+.dataframe thead th &#123;
+    text-align: right;
+&#125;
+</code></pre>
+<p></style></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Income</th>
+      <th>Lot_Size</th>
+      <th>Ownership</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>60</td>
+      <td>20</td>
+      <td>Owner</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>90</td>
+      <td>22</td>
+      <td>Owner</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>75</td>
+      <td>18</td>
+      <td>Nonowner</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">fig2, ax = plt.subplots()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘制数据集</span></span><br><span class="line">subset_owner = mower_df[mower_df[<span class="string">&#x27;Ownership&#x27;</span>] == <span class="string">&#x27;Owner&#x27;</span>]</span><br><span class="line">subset_nonowner = mower_df[mower_df[<span class="string">&#x27;Ownership&#x27;</span>] == <span class="string">&#x27;Nonowner&#x27;</span>]</span><br><span class="line">ax.scatter(subset_owner[<span class="string">&#x27;Income&#x27;</span>], subset_owner[<span class="string">&#x27;Lot_Size&#x27;</span>], color=<span class="string">&#x27;r&#x27;</span>, label=<span class="string">&#x27;Owner&#x27;</span>)</span><br><span class="line">ax.scatter(subset_nonowner[<span class="string">&#x27;Income&#x27;</span>], subset_nonowner[<span class="string">&#x27;Lot_Size&#x27;</span>], color=<span class="string">&#x27;b&#x27;</span>, label=<span class="string">&#x27;Nonowner&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘制预测集</span></span><br><span class="line">subset_owner = predict_df[predict_df[<span class="string">&#x27;Ownership&#x27;</span>] == <span class="string">&#x27;Owner&#x27;</span>]</span><br><span class="line">subset_nonowner = predict_df[predict_df[<span class="string">&#x27;Ownership&#x27;</span>] == <span class="string">&#x27;Nonowner&#x27;</span>]</span><br><span class="line">ax.scatter(subset_owner[<span class="string">&#x27;Income&#x27;</span>], subset_owner[<span class="string">&#x27;Lot_Size&#x27;</span>], color=<span class="string">&#x27;r&#x27;</span>, marker=<span class="string">&#x27;*&#x27;</span>)</span><br><span class="line">ax.scatter(subset_nonowner[<span class="string">&#x27;Income&#x27;</span>], subset_nonowner[<span class="string">&#x27;Lot_Size&#x27;</span>], color=<span class="string">&#x27;b&#x27;</span>, marker=<span class="string">&#x27;*&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘制近邻点</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">3</span>):                   <span class="comment"># 对预测集每项循环</span></span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">3</span>):               <span class="comment"># 对邻近点循环</span></span><br><span class="line">        x_values = [mower_df[<span class="string">&#x27;Income&#x27;</span>][indices[i, j]], predict_df[<span class="string">&#x27;Income&#x27;</span>][i]]</span><br><span class="line">        y_values = [mower_df[<span class="string">&#x27;Lot_Size&#x27;</span>][indices[i, j]], predict_df[<span class="string">&#x27;Lot_Size&#x27;</span>][i]]</span><br><span class="line">        ax.plot(x_values, y_values, color = <span class="string">&#x27;black&#x27;</span>, alpha = <span class="number">0.3</span>)</span><br><span class="line"></span><br><span class="line">plt.xlabel(<span class="string">&#x27;Income&#x27;</span>)</span><br><span class="line">plt.ylabel(<span class="string">&#x27;Lot Size&#x27;</span>)</span><br><span class="line">plt.legend()</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/696cb4"><img src="https://s3.ax1x.com/2021/02/28/696cb4.png" alt="696cb4.png"></a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/blog/tags/%E6%95%B0%E6%8D%AE%E7%A7%91%E5%AD%A6/" rel="tag"># 数据科学</a>
+              <a href="/blog/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+              <a href="/blog/tags/Python/" rel="tag"># Python</a>
+              <a href="/blog/tags/sklearn/" rel="tag"># sklearn</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/02/26/dynamic-memory-allocation/" rel="prev" title="C语言动态分配内存">
+                  <i class="fa fa-chevron-left"></i> C语言动态分配内存
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+  
+  
+  
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fas fa-h-square"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">黄梓聪</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.0/lib/anime.min.js"></script>
+<script src="/blog/js/utils.js"></script><script src="/blog/js/motion.js"></script><script src="/blog/js/schemes/muse.js"></script><script src="/blog/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+      <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    const script = document.createElement('script');
+    script.src = '//cdn.jsdelivr.net/npm/mathjax@3.1.0/es5/tex-mml-chtml.js';
+    script.defer = true;
+    document.head.appendChild(script);
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.typesetClear();
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
