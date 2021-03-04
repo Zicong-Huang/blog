@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"zicong-huang.github.io","root":"/blog/","scheme":"Muse","version":"8.0.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="简介这篇文章介绍了降维的基本思路及用奇异值分解（SVD）进行主成分分析（PCA）的操作。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Sklearn机器学习：维度下降和主成分分析">
+<meta property="og:url" content="https://zicong-huang.github.io/me.github.io/2021/03/04/ml-dimension-reduce-1/index.html">
+<meta property="og:site_name" content="ZICONG">
+<meta property="og:description" content="简介这篇文章介绍了降维的基本思路及用奇异值分解（SVD）进行主成分分析（PCA）的操作。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s3.ax1x.com/2021/03/04/6VKz1H.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/03/04/6VKx9e.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/03/04/6VKXtO.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/03/04/6VKOAK.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/03/04/6VKjhD.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/03/04/6VKq76.png">
+<meta property="article:published_time" content="2021-03-04T05:00:17.000Z">
+<meta property="article:modified_time" content="2021-03-04T05:12:45.859Z">
+<meta property="article:author" content="黄梓聪">
+<meta property="article:tag" content="数据科学">
+<meta property="article:tag" content="机器学习">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="sklearn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s3.ax1x.com/2021/03/04/6VKz1H.png">
+
+
+<link rel="canonical" href="https://zicong-huang.github.io/me.github.io/2021/03/04/ml-dimension-reduce-1/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Sklearn机器学习：维度下降和主成分分析 | ZICONG</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">ZICONG</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">梓聪的个人主页</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96"><span class="nav-number">2.</span> <span class="nav-text">依赖</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%99%8D%E7%BB%B4%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E8%B7%AF"><span class="nav-number">3.</span> <span class="nav-text">降维的基本思路</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%95%E5%B0%84"><span class="nav-number">3.1.</span> <span class="nav-text">投射</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E5%BD%A2%E5%AD%A6%E4%B9%A0"><span class="nav-number">3.2.</span> <span class="nav-text">流形学习</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BB%E6%88%90%E5%88%86%E5%88%86%E6%9E%90-PCA"><span class="nav-number">4.</span> <span class="nav-text">主成分分析(PCA)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SVD%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3"><span class="nav-number">4.1.</span> <span class="nav-text">SVD奇异值分解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Sklearn%E5%8C%85%E8%BF%9B%E8%A1%8CSVD"><span class="nav-number">4.2.</span> <span class="nav-text">使用Sklearn包进行SVD</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E5%B7%AE%E8%A7%A3%E9%87%8A%E7%8E%87%EF%BC%88Explained-Variance-Ratio%EF%BC%89"><span class="nav-number">4.3.</span> <span class="nav-text">方差解释率（Explained Variance Ratio）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E7%BB%B4%E5%BA%A6%E6%95%B0%E9%87%8F"><span class="nav-number">4.4.</span> <span class="nav-text">选择维度数量</span></a></li></ol></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">黄梓聪</p>
+  <div class="site-description" itemprop="description">想法，笔记，以及实验</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/blog/archives">
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/blog/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/blog/tags/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </section>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zicong-huang.github.io/me.github.io/2021/03/04/ml-dimension-reduce-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="黄梓聪">
+      <meta itemprop="description" content="想法，笔记，以及实验">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZICONG">
+    </span>
+
+    
+    
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Sklearn机器学习：维度下降和主成分分析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-03-04 00:00:17 / 修改时间：00:12:45" itemprop="dateCreated datePublished" datetime="2021-03-04T00:00:17-05:00">2021-03-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/blog/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>这篇文章介绍了降维的基本思路及用奇异值分解（SVD）进行主成分分析（PCA）的操作。</p>
+<a id="more"></a>
+
+<h1 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> numpy.linalg <span class="keyword">import</span> svd</span><br><span class="line"><span class="keyword">import</span> matplotlib</span><br><span class="line">%matplotlib inline</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> make_swiss_roll</span><br><span class="line"><span class="keyword">from</span> sklearn.manifold <span class="keyword">import</span> LocallyLinearEmbedding</span><br><span class="line"><span class="keyword">from</span> sklearn.decomposition <span class="keyword">import</span> PCA</span><br></pre></td></tr></table></figure>
+<h1 id="降维的基本思路"><a href="#降维的基本思路" class="headerlink" title="降维的基本思路"></a>降维的基本思路</h1><h2 id="投射"><a href="#投射" class="headerlink" title="投射"></a>投射</h2><p>如果数据点不是在各个维度上均匀地分布着：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">N = <span class="number">100</span></span><br><span class="line">x = np.random.normal(<span class="number">0</span>, <span class="number">1</span>, N)</span><br><span class="line">y = np.random.normal(<span class="number">0</span>, <span class="number">1</span>, N)</span><br><span class="line">z = <span class="number">3</span> * x + np.random.normal(<span class="number">0</span>, <span class="number">1</span>, N)</span><br><span class="line"></span><br><span class="line">fig = plt.figure(figsize=(<span class="number">8</span>,<span class="number">8</span>))</span><br><span class="line">ax1 = fig.add_subplot(<span class="number">1</span>, <span class="number">2</span>, <span class="number">1</span>, projection=<span class="string">&#x27;3d&#x27;</span>)</span><br><span class="line">ax1.scatter(x, y, z, c=<span class="string">&#x27;g&#x27;</span>, marker=<span class="string">&#x27;o&#x27;</span>)</span><br><span class="line">ax1.set_xlabel(<span class="string">&#x27;x&#x27;</span>)</span><br><span class="line">ax1.set_ylabel(<span class="string">&#x27;y&#x27;</span>)</span><br><span class="line">ax1.set_zlabel(<span class="string">&#x27;z&#x27;</span>)</span><br><span class="line">ax1.view_init(<span class="number">60</span>, <span class="number">60</span>)</span><br><span class="line"></span><br><span class="line">ax2 = fig.add_subplot(<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, projection=<span class="string">&#x27;3d&#x27;</span>)</span><br><span class="line">ax2.scatter(x, y, z, c=<span class="string">&#x27;g&#x27;</span>, marker=<span class="string">&#x27;o&#x27;</span>)</span><br><span class="line">ax2.set_xlabel(<span class="string">&#x27;x&#x27;</span>)</span><br><span class="line">ax2.set_ylabel(<span class="string">&#x27;y&#x27;</span>)</span><br><span class="line">ax2.set_zlabel(<span class="string">&#x27;z&#x27;</span>)</span><br><span class="line">ax2.view_init(<span class="number">20</span>, <span class="number">60</span>)</span><br><span class="line"></span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/6VKz1H"><img src="https://s3.ax1x.com/2021/03/04/6VKz1H.png" alt="6VKz1H.png"></a></p>
+<p>可见，在x和y轴上，数据点比较均匀地分布着。但是在z轴方向上，数据点比较集中在一个平面上面。因此降维的一个方式是找到一个平面，把这些数据点投射在这个平面上，将3维数据简化为2维数据。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">fig = plt.figure(figsize=(<span class="number">8</span>,<span class="number">8</span>))</span><br><span class="line">ax = fig.add_subplot(<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, projection=<span class="string">&#x27;3d&#x27;</span>)</span><br><span class="line">ax.scatter(x, y, z, c=<span class="string">&#x27;g&#x27;</span>, marker=<span class="string">&#x27;o&#x27;</span>)</span><br><span class="line">ax.set_xlabel(<span class="string">&#x27;x&#x27;</span>)</span><br><span class="line">ax.set_ylabel(<span class="string">&#x27;y&#x27;</span>)</span><br><span class="line">ax.set_zlabel(<span class="string">&#x27;z&#x27;</span>)</span><br><span class="line"></span><br><span class="line">xgrid = np.linspace(-<span class="number">3</span>, <span class="number">2</span>, <span class="number">100</span>)</span><br><span class="line">ygrid = np.linspace(-<span class="number">3</span>, <span class="number">3</span>, <span class="number">100</span>)</span><br><span class="line">xgrid, ygrid = np.meshgrid(xgrid, ygrid)</span><br><span class="line"></span><br><span class="line">ax.plot_surface(xgrid, ygrid, <span class="number">3</span> * xgrid, color = <span class="string">&#x27;green&#x27;</span>, alpha = <span class="number">0.3</span>)</span><br><span class="line">ax.view_init(<span class="number">30</span>, <span class="number">70</span>)</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/6VKx9e"><img src="https://s3.ax1x.com/2021/03/04/6VKx9e.png" alt="6VKx9e.png"></a></p>
+<h2 id="流形学习"><a href="#流形学习" class="headerlink" title="流形学习"></a>流形学习</h2><p>一个$d$维流形可以理解为一个$n$维曲面，其局部可以被$d$维超平面近似。例如，一个在3维空间种的2维流形可以被理解为一个3维曲面，其局部可以被一个2维平面近似。下面的“瑞士卷”是2维流形在3维空间中的例子。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">N = <span class="number">3000</span></span><br><span class="line">swiss_roll = make_swiss_roll(N)</span><br><span class="line">x, color = swiss_roll</span><br><span class="line"></span><br><span class="line">fig = plt.figure(figsize=(<span class="number">8</span>,<span class="number">8</span>))</span><br><span class="line">ax = fig.add_subplot(<span class="number">111</span>, projection=<span class="string">&#x27;3d&#x27;</span>)</span><br><span class="line">ax.scatter(x[:,<span class="number">0</span>], x[:,<span class="number">1</span>], x[:,<span class="number">2</span>], c = color, cmap = <span class="string">&#x27;winter&#x27;</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/6VKXtO"><img src="https://s3.ax1x.com/2021/03/04/6VKXtO.png" alt="6VKXtO.png"></a></p>
+<p>如果可以将这个流形展开，我们可以将3维数据集降维到2维。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">embedding = LocallyLinearEmbedding(n_components=<span class="number">2</span>, n_neighbors=<span class="number">12</span>)</span><br><span class="line">x_unfold = embedding.fit_transform(x)</span><br><span class="line"></span><br><span class="line">fig, ax = plt.subplots()</span><br><span class="line">ax.scatter(x_unfold[:,<span class="number">0</span>], x_unfold[:, <span class="number">1</span>], c = color, cmap = <span class="string">&#x27;winter&#x27;</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/6VKOAK"><img src="https://s3.ax1x.com/2021/03/04/6VKOAK.png" alt="6VKOAK.png"></a></p>
+<h1 id="主成分分析-PCA"><a href="#主成分分析-PCA" class="headerlink" title="主成分分析(PCA)"></a>主成分分析(PCA)</h1><p>主成分分析的思路是投影。核心思想是降维后，保留尽量多的数据方差。步骤是：</p>
+<ol>
+<li>确定第一个主成分：找到一个向量，使当数据投影到这个向量上面时，方差最大。</li>
+<li>确定第二个主成分：找到第二个向量与第一个向量正交，使投影到这个向量上的方差最大。</li>
+</ol>
+<p>重复这个过程，对于n维数据，最多找到n个主成分。</p>
+<p>注意，主成分分解的时候应该先对数据进行转换，使数据集的每个特征的均值为0，主成分向量将默认以0点作为原点。</p>
+<h2 id="SVD奇异值分解"><a href="#SVD奇异值分解" class="headerlink" title="SVD奇异值分解"></a>SVD奇异值分解</h2><p>设$X$为原数据矩阵，则SVD将其分解为：</p>
+<p>$$<br>\begin{align}<br>X = U \Sigma V^T<br>\end{align}<br>$$</p>
+<p>其中，$V$包含了n维矩阵$X$的n个主成分。假设现在要用其中的3个主成分来反映这些数据：</p>
+<p>$$<br>\begin{align}<br>X_{proj_3} = XW_3<br>\end{align}<br>$$</p>
+<p>其中，$W_3$包含了$V$的前3列。</p>
+<p>下面用SVD法来分解一个类似第一部分的例子。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">N = <span class="number">100</span></span><br><span class="line">x1 = np.random.normal(<span class="number">0</span>, <span class="number">1</span>, N)</span><br><span class="line">x2 = np.random.normal(<span class="number">0</span>, <span class="number">1</span>, N)</span><br><span class="line">x3 = <span class="number">3</span> * x1 + np.random.normal(<span class="number">0</span>, <span class="number">1</span>, N)</span><br><span class="line">xmat = np.stack((x1, x2, x3), axis=<span class="number">1</span>)</span><br><span class="line">xmat.shape</span><br><span class="line"><span class="comment"># 均值归0</span></span><br><span class="line">xmat_centered = xmat - xmat.mean(axis=<span class="number">0</span>)   <span class="comment"># 对每一个特征去均值</span></span><br><span class="line">u, sigma, v = svd(xmat_centered)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 投影：取两个主成分</span></span><br><span class="line">w2 = v.T[:, :<span class="number">2</span>]</span><br><span class="line">xmat_proj = xmat_centered @ w2</span><br><span class="line"></span><br><span class="line"><span class="comment"># 画图</span></span><br><span class="line">fig = plt.figure(figsize=(<span class="number">12</span>,<span class="number">6</span>))</span><br><span class="line">ax1 = fig.add_subplot(<span class="number">1</span>, <span class="number">2</span>, <span class="number">1</span>, projection=<span class="string">&#x27;3d&#x27;</span>)</span><br><span class="line">ax1.scatter(x1, x2, x3, c=<span class="string">&#x27;g&#x27;</span>, marker=<span class="string">&#x27;o&#x27;</span>)</span><br><span class="line">ax1.set_xlabel(<span class="string">&#x27;x&#x27;</span>)</span><br><span class="line">ax1.set_ylabel(<span class="string">&#x27;y&#x27;</span>)</span><br><span class="line">ax1.set_zlabel(<span class="string">&#x27;z&#x27;</span>)</span><br><span class="line">ax1.view_init(<span class="number">60</span>, <span class="number">60</span>)</span><br><span class="line"></span><br><span class="line">xgrid = np.linspace(-<span class="number">3</span>, <span class="number">3</span>, <span class="number">100</span>)</span><br><span class="line">ygrid = np.linspace(-<span class="number">3</span>, <span class="number">3</span>, <span class="number">100</span>)</span><br><span class="line">xgrid, ygrid = np.meshgrid(xgrid, ygrid)</span><br><span class="line"></span><br><span class="line">ax1.plot_surface(xgrid, ygrid, <span class="number">3</span> * xgrid, color = <span class="string">&#x27;green&#x27;</span>, alpha = <span class="number">0.3</span>)</span><br><span class="line">ax1.view_init(<span class="number">40</span>, <span class="number">70</span>)</span><br><span class="line"></span><br><span class="line">ax2 = fig.add_subplot(<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>)</span><br><span class="line">ax2.scatter(xmat_proj[:,<span class="number">0</span>], xmat_proj[:,<span class="number">1</span>], c = <span class="string">&#x27;g&#x27;</span>)</span><br><span class="line"></span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/6VKjhD"><img src="https://s3.ax1x.com/2021/03/04/6VKjhD.png" alt="6VKjhD.png"></a></p>
+<h2 id="使用Sklearn包进行SVD"><a href="#使用Sklearn包进行SVD" class="headerlink" title="使用Sklearn包进行SVD"></a>使用Sklearn包进行SVD</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pca = PCA(n_components = <span class="number">2</span>)</span><br><span class="line">xmat_proj = pca.fit_transform(xmat_centered)</span><br></pre></td></tr></table></figure>
+<h2 id="方差解释率（Explained-Variance-Ratio）"><a href="#方差解释率（Explained-Variance-Ratio）" class="headerlink" title="方差解释率（Explained Variance Ratio）"></a>方差解释率（Explained Variance Ratio）</h2><p>某个主成分的方差解释率，是指此主成分保留的方差占原来的总方差的比例。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">evr = pca.explained_variance_ratio_</span><br><span class="line"></span><br><span class="line">print(evr)</span><br></pre></td></tr></table></figure>
+<pre><code>[0.89202644 0.09989671]
+</code></pre>
+<p>这意味着，第一个主成分保留了89.2%的方差，第二个主成分保留了10.2%的方差。失去的方差是：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(<span class="string">&quot;&#123;: .2%&#125;&quot;</span>.<span class="built_in">format</span>(<span class="number">1</span> - evr[<span class="number">0</span>] - evr[<span class="number">1</span>]))</span><br></pre></td></tr></table></figure>
+<pre><code> 0.81%
+</code></pre>
+<h2 id="选择维度数量"><a href="#选择维度数量" class="headerlink" title="选择维度数量"></a>选择维度数量</h2><p>假设要求主成分的方差解释率达到某个值，则在<code>PCA</code>中对<code>n_components</code>中指定一个浮点数。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pca = PCA(n_components=<span class="number">0.95</span>)  <span class="comment"># 方差解释率达到95%以上</span></span><br><span class="line">xmat_proj = pca.fit_transform(xmat_centered)</span><br><span class="line">print(<span class="string">&quot;Preserve &#123;:n&#125; dimension(s).&quot;</span>.<span class="built_in">format</span>(xmat_proj.shape[<span class="number">1</span>]))</span><br></pre></td></tr></table></figure>
+<pre><code>Preserve 2 dimension(s).
+</code></pre>
+<p>另一方面，我们可以参考维度数量与累计维度解释率的关系。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 生成示例数据</span></span><br><span class="line">N = <span class="number">1000</span></span><br><span class="line">x1 = np.random.normal(<span class="number">0</span>, <span class="number">1</span>, N)</span><br><span class="line">x2 = np.random.normal(<span class="number">0</span>, <span class="number">1</span>, N)</span><br><span class="line">x3 = x1 + x2 * x1 + np.random.normal(<span class="number">0</span>, <span class="number">1</span>, N)</span><br><span class="line">x4 = x1 + x2**<span class="number">2</span> + x3 + np.random.normal(<span class="number">0</span>, <span class="number">1</span>, N)</span><br><span class="line">x5 = x2 + x4 + np.random.normal(<span class="number">0</span>, <span class="number">1</span>, N)</span><br><span class="line">x6 = x3 + np.random.normal(<span class="number">0</span>, <span class="number">1</span>, N)</span><br><span class="line">x7 = np.random.normal(<span class="number">0</span>, <span class="number">1</span>, N)</span><br><span class="line">xmat = np.stack((x1, x2, x3, x4, x5, x6, x7))</span><br><span class="line"></span><br><span class="line"><span class="comment"># pca</span></span><br><span class="line">pca = PCA()</span><br><span class="line">pca.fit(xmat)   <span class="comment"># 不需要去均值；PCA自动做了</span></span><br><span class="line">cum_evr = np.cumsum(pca.explained_variance_ratio_)   <span class="comment"># 累计方差解释率</span></span><br><span class="line">cum_evr = np.insert(cum_evr, <span class="number">0</span>, <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 画图</span></span><br><span class="line">fig, ax = plt.subplots()</span><br><span class="line">ax.plot(<span class="built_in">range</span>(<span class="number">0</span>, <span class="built_in">len</span>(cum_evr)), cum_evr)</span><br><span class="line">ax.set_xlabel(<span class="string">&#x27;nDimensions&#x27;</span>)</span><br><span class="line">ax.set_ylabel(<span class="string">&#x27;Explained Variance Ratio&#x27;</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/6VKq76"><img src="https://s3.ax1x.com/2021/03/04/6VKq76.png" alt="6VKq76.png"></a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/blog/tags/%E6%95%B0%E6%8D%AE%E7%A7%91%E5%AD%A6/" rel="tag"># 数据科学</a>
+              <a href="/blog/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+              <a href="/blog/tags/Python/" rel="tag"># Python</a>
+              <a href="/blog/tags/sklearn/" rel="tag"># sklearn</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/03/02/ml-sklearn-naive-bayes/" rel="prev" title="Sklearn机器学习：朴素贝叶斯（极简）">
+                  <i class="fa fa-chevron-left"></i> Sklearn机器学习：朴素贝叶斯（极简）
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+  
+  
+  
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fas fa-h-square"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">黄梓聪</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.0/lib/anime.min.js"></script>
+<script src="/blog/js/utils.js"></script><script src="/blog/js/motion.js"></script><script src="/blog/js/schemes/muse.js"></script><script src="/blog/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+      <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    const script = document.createElement('script');
+    script.src = '//cdn.jsdelivr.net/npm/mathjax@3.1.0/es5/tex-mml-chtml.js';
+    script.defer = true;
+    document.head.appendChild(script);
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.typesetClear();
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
