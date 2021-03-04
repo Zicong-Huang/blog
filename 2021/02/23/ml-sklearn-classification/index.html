@@ -22,12 +22,12 @@
     var CONFIG = {"hostname":"zicong-huang.github.io","root":"/blog/","scheme":"Muse","version":"8.0.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
   </script>
 
-  <meta name="description" content="MNIST 数据库导入MNIST数据库： 1234from sklearn.datasets import fetch_openmlmnist &#x3D; fetch_openml(&quot;mnist_784&quot;, version&#x3D;1)mnist.keys()">
+  <meta name="description" content="MNIST 数据库导入MNIST数据库： from sklearn.datasets import fetch_openml  mnist &#x3D; fetch_openml(&quot;mnist_784&quot;, version&#x3D;1) mnist.keys()">
 <meta property="og:type" content="article">
 <meta property="og:title" content="sklearn机器学习：Classification">
 <meta property="og:url" content="https://zicong-huang.github.io/me.github.io/2021/02/23/ml-sklearn-classification/index.html">
 <meta property="og:site_name" content="ZICONG">
-<meta property="og:description" content="MNIST 数据库导入MNIST数据库： 1234from sklearn.datasets import fetch_openmlmnist &#x3D; fetch_openml(&quot;mnist_784&quot;, version&#x3D;1)mnist.keys()">
+<meta property="og:description" content="MNIST 数据库导入MNIST数据库： from sklearn.datasets import fetch_openml  mnist &#x3D; fetch_openml(&quot;mnist_784&quot;, version&#x3D;1) mnist.keys()">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://s3.ax1x.com/2021/02/24/yOZRyT.png">
 <meta property="og:image" content="https://s3.ax1x.com/2021/02/24/yOZ4w4.png">
@@ -273,7 +273,10 @@
     
     <div class="post-body" itemprop="articleBody">
         <h2 id="MNIST-数据库"><a href="#MNIST-数据库" class="headerlink" title="MNIST 数据库"></a>MNIST 数据库</h2><p>导入MNIST数据库：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> fetch_openml</span><br><span class="line"></span><br><span class="line">mnist = fetch_openml(<span class="string">&quot;mnist_784&quot;</span>, version=<span class="number">1</span>)</span><br><span class="line">mnist.keys()</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>datasets <span class="token keyword">import</span> fetch_openml
+
+mnist <span class="token operator">=</span> fetch_openml<span class="token punctuation">(</span><span class="token string">"mnist_784"</span><span class="token punctuation">,</span> version<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span>
+mnist<span class="token punctuation">.</span>keys<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <a id="more"></a>
 
 
@@ -286,56 +289,92 @@
 <li><code>data</code>:     X数组，每行是一个instance，每列是一个feature</li>
 <li><code>target</code>：  y数组</li>
 </ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">x = mnist[<span class="string">&quot;data&quot;</span>].to_numpy()</span><br><span class="line">y = mnist[<span class="string">&quot;target&quot;</span>].to_numpy()</span><br><span class="line"></span><br><span class="line">print(<span class="string">&quot;x shape&quot;</span>, x.shape)</span><br><span class="line">print(<span class="string">&quot;y shape&quot;</span>, y.shape)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">x <span class="token operator">=</span> mnist<span class="token punctuation">[</span><span class="token string">"data"</span><span class="token punctuation">]</span><span class="token punctuation">.</span>to_numpy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+y <span class="token operator">=</span> mnist<span class="token punctuation">[</span><span class="token string">"target"</span><span class="token punctuation">]</span><span class="token punctuation">.</span>to_numpy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"x shape"</span><span class="token punctuation">,</span> x<span class="token punctuation">.</span>shape<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"y shape"</span><span class="token punctuation">,</span> y<span class="token punctuation">.</span>shape<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre><code>x shape (70000, 784)
 y shape (70000,)
 </code></pre>
 <p>一共有784个features，每个features表示一个像素点的灰度，每幅图像有$28\times28$个像素。</p>
 <p>下面查看其中一个instance。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib <span class="keyword">as</span> mpl</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line">some_digit = x[<span class="number">0</span>]</span><br><span class="line">some_digit_image = some_digit.reshape(<span class="number">28</span>, <span class="number">28</span>)</span><br><span class="line"></span><br><span class="line">plt.imshow(some_digit_image, cmap=<span class="string">&quot;binary&quot;</span>)</span><br><span class="line">plt.axis(<span class="string">&quot;off&quot;</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> matplotlib <span class="token keyword">as</span> mpl
+<span class="token keyword">import</span> matplotlib<span class="token punctuation">.</span>pyplot <span class="token keyword">as</span> plt
+
+some_digit <span class="token operator">=</span> x<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+some_digit_image <span class="token operator">=</span> some_digit<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span><span class="token number">28</span><span class="token punctuation">,</span> <span class="token number">28</span><span class="token punctuation">)</span>
+
+plt<span class="token punctuation">.</span>imshow<span class="token punctuation">(</span>some_digit_image<span class="token punctuation">,</span> cmap<span class="token operator">=</span><span class="token string">"binary"</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>axis<span class="token punctuation">(</span><span class="token string">"off"</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p><a target="_blank" rel="noopener" href="https://imgtu.com/i/yOZRyT"><img src="https://s3.ax1x.com/2021/02/24/yOZRyT.png" alt="yOZRyT.png"></a></p>
 <p>y是以字符串形式储存的，所以要转换为整数类型。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line">y = y.astype(np.<span class="built_in">int</span>)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+
+y <span class="token operator">=</span> y<span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span><span class="token builtin">int</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <p>数据库已经预先“洗牌”并且划分好训练集（60,000）和测试集（10,000）:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x_train, x_test = x[:<span class="number">60000</span>], x[<span class="number">60000</span>:]</span><br><span class="line">y_train, y_test = y[:<span class="number">60000</span>], y[<span class="number">60000</span>:]</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">x_train<span class="token punctuation">,</span> x_test <span class="token operator">=</span> x<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">60000</span><span class="token punctuation">]</span><span class="token punctuation">,</span> x<span class="token punctuation">[</span><span class="token number">60000</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
+y_train<span class="token punctuation">,</span> y_test <span class="token operator">=</span> y<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">60000</span><span class="token punctuation">]</span><span class="token punctuation">,</span> y<span class="token punctuation">[</span><span class="token number">60000</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <h2 id="训练一个binary-classifier"><a href="#训练一个binary-classifier" class="headerlink" title="训练一个binary classifier"></a>训练一个binary classifier</h2><p>以数字5为例，下面训练一个classifier，区分一个手写数字是5还是不是5。</p>
 <p>创建一个关于数字是否是5的0/1向量：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">y_train_5 = (y_train == <span class="number">5</span>)</span><br><span class="line">y_test_5 = (y_test == <span class="number">5</span>)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">y_train_5 <span class="token operator">=</span> <span class="token punctuation">(</span>y_train <span class="token operator">==</span> <span class="token number">5</span><span class="token punctuation">)</span>
+y_test_5 <span class="token operator">=</span> <span class="token punctuation">(</span>y_test <span class="token operator">==</span> <span class="token number">5</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <p>使用SGD classifier训练模型:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> SGDClassifier</span><br><span class="line"></span><br><span class="line">sgd_clf = SGDClassifier()        <span class="comment"># random_state 相当于 seed</span></span><br><span class="line">sgd_clf.fit(x_train, y_train_5)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>linear_model <span class="token keyword">import</span> SGDClassifier
+
+sgd_clf <span class="token operator">=</span> SGDClassifier<span class="token punctuation">(</span><span class="token punctuation">)</span>        <span class="token comment"># random_state 相当于 seed</span>
+sgd_clf<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>x_train<span class="token punctuation">,</span> y_train_5<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
 
 
 <pre><code>SGDClassifier()
 </code></pre>
 <p>Try this classifier on some numbers.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sgd_clf.predict([some_digit])</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">sgd_clf<span class="token punctuation">.</span>predict<span class="token punctuation">(</span><span class="token punctuation">[</span>some_digit<span class="token punctuation">]</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 
 
 <pre><code>array([ True])
 </code></pre>
-<h2 id="Performance-Measures"><a href="#Performance-Measures" class="headerlink" title="Performance Measures"></a>Performance Measures</h2><h3 id="Measuring-accuracy-using-cross-validation"><a href="#Measuring-accuracy-using-cross-validation" class="headerlink" title="Measuring accuracy using cross-validation"></a>Measuring accuracy using cross-validation</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> cross_val_score</span><br><span class="line"></span><br><span class="line">cross_val_score(sgd_clf, x_train, y_train_5, cv=<span class="number">3</span>, scoring=<span class="string">&quot;accuracy&quot;</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="Performance-Measures"><a href="#Performance-Measures" class="headerlink" title="Performance Measures"></a>Performance Measures</h2><h3 id="Measuring-accuracy-using-cross-validation"><a href="#Measuring-accuracy-using-cross-validation" class="headerlink" title="Measuring accuracy using cross-validation"></a>Measuring accuracy using cross-validation</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>model_selection <span class="token keyword">import</span> cross_val_score
+
+cross_val_score<span class="token punctuation">(</span>sgd_clf<span class="token punctuation">,</span> x_train<span class="token punctuation">,</span> y_train_5<span class="token punctuation">,</span> cv<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span> scoring<span class="token operator">=</span><span class="token string">"accuracy"</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
 
 
 <pre><code>array([0.957  , 0.96095, 0.96665])
 </code></pre>
 <p>因为这个classifier只区分数字是不是5，而数据集中5只占10%，所以一个总是猜5以外的数字的分类器也能得到90%的准确率 – 和我们训练好的classifier没有表现出多大差距。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.base <span class="keyword">import</span> BaseEstimator</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Never5Classifier</span>(<span class="params">BaseEstimator</span>):</span></span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">    这个分类器不会做任何拟合的努力</span></span><br><span class="line"><span class="string">    这个分类器总是预测0</span></span><br><span class="line"><span class="string">    &#x27;&#x27;&#x27;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">fit</span>(<span class="params">self, x, y=<span class="literal">None</span></span>):</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">predict</span>(<span class="params">self, x</span>):</span></span><br><span class="line">        <span class="keyword">return</span> np.zeros((<span class="built_in">len</span>(x), <span class="number">1</span>), dtype=<span class="built_in">bool</span>)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>base <span class="token keyword">import</span> BaseEstimator
+
+<span class="token keyword">class</span> <span class="token class-name">Never5Classifier</span><span class="token punctuation">(</span>BaseEstimator<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">'''
+    这个分类器不会做任何拟合的努力
+    这个分类器总是预测0
+    '''</span>
+    <span class="token keyword">def</span> <span class="token function">fit</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">,</span> y<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">pass</span>
+    <span class="token keyword">def</span> <span class="token function">predict</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> dtype<span class="token operator">=</span><span class="token builtin">bool</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>下面来看看<code>Never5Classifier</code>的准确度：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">never_5_clf = Never5Classifier()</span><br><span class="line">cross_val_score(never_5_clf, x_train, y_train_5, cv=<span class="number">3</span>, scoring=<span class="string">&quot;accuracy&quot;</span>)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">never_5_clf <span class="token operator">=</span> Never5Classifier<span class="token punctuation">(</span><span class="token punctuation">)</span>
+cross_val_score<span class="token punctuation">(</span>never_5_clf<span class="token punctuation">,</span> x_train<span class="token punctuation">,</span> y_train_5<span class="token punctuation">,</span> cv<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span> scoring<span class="token operator">=</span><span class="token string">"accuracy"</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 
 
 <pre><code>array([0.91125, 0.90855, 0.90915])
 </code></pre>
 <p>因此，准确度一般<strong>不</strong>是对classifier最好的分类标准。特别是对于一个skewed datasets（一些类别出现的频率远高于另一些频率时）。在此处。非5出现的频率远高于5的频率。</p>
-<h3 id="Confusion-Matrix"><a href="#Confusion-Matrix" class="headerlink" title="Confusion Matrix"></a>Confusion Matrix</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> cross_val_predict</span><br><span class="line"></span><br><span class="line">y_train_pred = cross_val_predict(sgd_clf, x_train, y_train_5, cv=<span class="number">3</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="Confusion-Matrix"><a href="#Confusion-Matrix" class="headerlink" title="Confusion Matrix"></a>Confusion Matrix</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>model_selection <span class="token keyword">import</span> cross_val_predict
+
+y_train_pred <span class="token operator">=</span> cross_val_predict<span class="token punctuation">(</span>sgd_clf<span class="token punctuation">,</span> x_train<span class="token punctuation">,</span> y_train_5<span class="token punctuation">,</span> cv<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <p>This returns the predictions made on each test fold. This means that you get a clean prediction for each instance in the training set. “Clean” means that the prediction is made by a model that never saw the data during training.</p>
 <p>Now get the confusion matrix.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> confusion_matrix</span><br><span class="line"></span><br><span class="line">confusion_matrix(y_train_5, y_train_pred)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>metrics <span class="token keyword">import</span> confusion_matrix
+
+confusion_matrix<span class="token punctuation">(</span>y_train_5<span class="token punctuation">,</span> y_train_pred<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
 
 
@@ -358,13 +397,23 @@ y shape (70000,)
 <p>$$<br>precision = \frac{TP}{TP+FP}<br>$$</p>
 <p>recall, sensitivity or the true positive rate (TPR): ratio of positive instances that are correctly detected by the classifier:</p>
 <p>$$<br>recall = \frac{TP}{TP+FN}<br>$$</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> precision_score, recall_score</span><br><span class="line"></span><br><span class="line">precision = precision_score(y_train_5, y_train_pred)</span><br><span class="line">recall = recall_score(y_train_5, y_train_pred)</span><br><span class="line"></span><br><span class="line">print(<span class="string">&quot;Precision\t&#123;:.4f&#125;&quot;</span>.<span class="built_in">format</span>(precision))</span><br><span class="line">print(<span class="string">&quot;Recall\t\t&#123;:.4f&#125;&quot;</span>.<span class="built_in">format</span>(recall))</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>metrics <span class="token keyword">import</span> precision_score<span class="token punctuation">,</span> recall_score
+
+precision <span class="token operator">=</span> precision_score<span class="token punctuation">(</span>y_train_5<span class="token punctuation">,</span> y_train_pred<span class="token punctuation">)</span>
+recall <span class="token operator">=</span> recall_score<span class="token punctuation">(</span>y_train_5<span class="token punctuation">,</span> y_train_pred<span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Precision\t&#123;:.4f&#125;"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>precision<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Recall\t\t&#123;:.4f&#125;"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>recall<span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre><code>Precision    0.7647
 Recall        0.7823
 </code></pre>
 <p>$F_1$ score: harmonic mean of precision and recall classifier. The harmonic mean gives much more weight to low values. As a result, the classifier will only get a high $F_1$ score if both recall and precision are high.</p>
 <p>$$<br>\begin{align}<br>F_1 = \frac{2}{\frac{1}{precision} + \frac{1}{recall}}<br>    = 2 \times \frac{precision \times recall}{precision + recall}<br>    = \frac{TP}{TP + \frac{FN + FP}{2}}<br>\end{align}<br>$$</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> f1_score</span><br><span class="line"></span><br><span class="line">f1 = f1_score(y_train_5, y_train_pred)</span><br><span class="line"></span><br><span class="line">print(<span class="string">&quot;F1\t&#123;:.4f&#125;&quot;</span>.<span class="built_in">format</span>(f1))</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>metrics <span class="token keyword">import</span> f1_score
+
+f1 <span class="token operator">=</span> f1_score<span class="token punctuation">(</span>y_train_5<span class="token punctuation">,</span> y_train_pred<span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"F1\t&#123;:.4f&#125;"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>f1<span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <pre><code>F1    0.7734
 </code></pre>
 <h3 id="Precision-Recall-Trade-off"><a href="#Precision-Recall-Trade-off" class="headerlink" title="Precision/Recall Trade-off"></a>Precision/Recall Trade-off</h3><p>Sometimes want high precision even if low recall: </p>
@@ -372,13 +421,17 @@ Recall        0.7823
 <p>Sometimes want high recall even if low precision:</p>
 <p>安保报警器 – 提高阳性实例被找到的概率，尽管这意味着阳性判断准确率会下降。</p>
 <p>事实上， precision 和 recall 会存在一个权衡取舍的关系。在分类时，提高阳性门槛，会提高precision，但是降低recall，相反，降低阳性门槛会提高recall，但是可以提高阳性门槛。下面是人为为预测设定门槛的方法。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># access the decision score that the classifier uses to make decision</span></span><br><span class="line">y_scores = sgd_clf.decision_function([some_digit])</span><br><span class="line">y_scores</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment"># access the decision score that the classifier uses to make decision</span>
+y_scores <span class="token operator">=</span> sgd_clf<span class="token punctuation">.</span>decision_function<span class="token punctuation">(</span><span class="token punctuation">[</span>some_digit<span class="token punctuation">]</span><span class="token punctuation">)</span>
+y_scores<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
 
 
 <pre><code>array([1039.78028102])
 </code></pre>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">threshold = <span class="number">0</span></span><br><span class="line">y_some_digit_pred = (y_scores &gt; threshold)</span><br><span class="line">y_some_digit_pred</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">threshold <span class="token operator">=</span> <span class="token number">0</span>
+y_some_digit_pred <span class="token operator">=</span> <span class="token punctuation">(</span>y_scores <span class="token operator">></span> threshold<span class="token punctuation">)</span>
+y_some_digit_pred<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
 
 
@@ -386,27 +439,51 @@ Recall        0.7823
 </code></pre>
 <p>下面是选择threshold的方法。</p>
 <p>首先，用<code>cross_val_predict()</code>函数获得所有训练集实例的预测值(clean)，但要求返回decision score而不是<code>True/False</code>的decision。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">y_scores = cross_val_predict(sgd_clf, x_train, y_train_5, cv=<span class="number">3</span>,</span><br><span class="line">                             method=<span class="string">&quot;decision_function&quot;</span>)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">y_scores <span class="token operator">=</span> cross_val_predict<span class="token punctuation">(</span>sgd_clf<span class="token punctuation">,</span> x_train<span class="token punctuation">,</span> y_train_5<span class="token punctuation">,</span> cv<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span>
+                             method<span class="token operator">=</span><span class="token string">"decision_function"</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <p>使用<code>precision_recall_curve</code>函数计算所有可能threshold的对应precision与recall。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> precision_recall_curve</span><br><span class="line"></span><br><span class="line">precisions, recalls, thresholds = precision_recall_curve(y_train_5, y_scores)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>metrics <span class="token keyword">import</span> precision_recall_curve
+
+precisions<span class="token punctuation">,</span> recalls<span class="token punctuation">,</span> thresholds <span class="token operator">=</span> precision_recall_curve<span class="token punctuation">(</span>y_train_5<span class="token punctuation">,</span> y_scores<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <p>使用<code>Matplotlib</code>作图。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">plot_precision_recall_vs_threshold</span>(<span class="params">precisions, recalls, thresholds</span>):</span></span><br><span class="line">    plt.plot(thresholds, precisions[:-<span class="number">1</span>], <span class="string">&quot;b--&quot;</span>, label=<span class="string">&quot;Precision&quot;</span>)</span><br><span class="line">    plt.plot(thresholds, recalls[:-<span class="number">1</span>], <span class="string">&quot;g-&quot;</span>, label=<span class="string">&quot;Recall&quot;</span>)</span><br><span class="line">    plt.legend()</span><br><span class="line">    plt.xlabel(<span class="string">&quot;threshold&quot;</span>)</span><br><span class="line">    plt.ylim((<span class="number">0</span>,<span class="number">1</span>))</span><br><span class="line">    plt.grid()</span><br><span class="line"></span><br><span class="line">plot_precision_recall_vs_threshold(precisions, recalls, thresholds)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">plot_precision_recall_vs_threshold</span><span class="token punctuation">(</span>precisions<span class="token punctuation">,</span> recalls<span class="token punctuation">,</span> thresholds<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    plt<span class="token punctuation">.</span>plot<span class="token punctuation">(</span>thresholds<span class="token punctuation">,</span> precisions<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">"b--"</span><span class="token punctuation">,</span> label<span class="token operator">=</span><span class="token string">"Precision"</span><span class="token punctuation">)</span>
+    plt<span class="token punctuation">.</span>plot<span class="token punctuation">(</span>thresholds<span class="token punctuation">,</span> recalls<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">"g-"</span><span class="token punctuation">,</span> label<span class="token operator">=</span><span class="token string">"Recall"</span><span class="token punctuation">)</span>
+    plt<span class="token punctuation">.</span>legend<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    plt<span class="token punctuation">.</span>xlabel<span class="token punctuation">(</span><span class="token string">"threshold"</span><span class="token punctuation">)</span>
+    plt<span class="token punctuation">.</span>ylim<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    plt<span class="token punctuation">.</span>grid<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+plot_precision_recall_vs_threshold<span class="token punctuation">(</span>precisions<span class="token punctuation">,</span> recalls<span class="token punctuation">,</span> thresholds<span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p><a target="_blank" rel="noopener" href="https://imgtu.com/i/yOZ4w4"><img src="https://s3.ax1x.com/2021/02/24/yOZ4w4.png" alt="yOZ4w4.png"></a></p>
 <p>Precision在高threshold处呈现出一段bumpy的区间。这是因为，随着threshold的提高，能被认定阳性的案例减少，因而对于每一个错误都非常敏感。相反，在高threshold处，能被认定为阳性的案例已经很少了，再错漏一个不会有太大影响。</p>
 <p>再分析在低threshold处，能被认定为阳性的案例很多，因此认错也多，再多认错一个敏感度不高，所以precision平滑；由于能被认定为阳性的案例很多，能找到的阳性基本都被找出来了，再少一个或者多一个，敏感度不大。</p>
 <p>另一种方法：直接画出precision和recall的关系：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">plot_precision_vs_recall</span>(<span class="params">precisions, recalls</span>):</span></span><br><span class="line">    plt.plot(recalls, precisions, <span class="string">&quot;b-&quot;</span>)</span><br><span class="line">    plt.xlabel(<span class="string">&quot;Recall&quot;</span>)</span><br><span class="line">    plt.ylabel(<span class="string">&quot;Precision&quot;</span>)</span><br><span class="line">    plt.xlim((<span class="number">0</span>,<span class="number">1</span>))</span><br><span class="line">    plt.ylim((<span class="number">0</span>,<span class="number">1</span>))</span><br><span class="line">    plt.grid()</span><br><span class="line">    </span><br><span class="line">plot_precision_vs_recall(precisions, recalls)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">plot_precision_vs_recall</span><span class="token punctuation">(</span>precisions<span class="token punctuation">,</span> recalls<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    plt<span class="token punctuation">.</span>plot<span class="token punctuation">(</span>recalls<span class="token punctuation">,</span> precisions<span class="token punctuation">,</span> <span class="token string">"b-"</span><span class="token punctuation">)</span>
+    plt<span class="token punctuation">.</span>xlabel<span class="token punctuation">(</span><span class="token string">"Recall"</span><span class="token punctuation">)</span>
+    plt<span class="token punctuation">.</span>ylabel<span class="token punctuation">(</span><span class="token string">"Precision"</span><span class="token punctuation">)</span>
+    plt<span class="token punctuation">.</span>xlim<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    plt<span class="token punctuation">.</span>ylim<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    plt<span class="token punctuation">.</span>grid<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    
+plot_precision_vs_recall<span class="token punctuation">(</span>precisions<span class="token punctuation">,</span> recalls<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p><a target="_blank" rel="noopener" href="https://imgtu.com/i/yOZhmF"><img src="https://s3.ax1x.com/2021/02/24/yOZhmF.png" alt="yOZhmF.png"></a></p>
 <p>假如想要90% precision</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">threshold_90_precision = thresholds[np.argmax(precisions &gt;= <span class="number">0.90</span>)]</span><br><span class="line">threshold_90_precision</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">threshold_90_precision <span class="token operator">=</span> thresholds<span class="token punctuation">[</span>np<span class="token punctuation">.</span>argmax<span class="token punctuation">(</span>precisions <span class="token operator">>=</span> <span class="token number">0.90</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+threshold_90_precision<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 
 
 <pre><code>3056.0585000597052
 </code></pre>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">y_train_pred_90 = (y_scores &gt;= threshold_90_precision)</span><br><span class="line"></span><br><span class="line">print(<span class="string">&quot;Precision\t&#123;:.4f&#125;&quot;</span>.<span class="built_in">format</span>(precision_score(y_train_5, y_train_pred_90)))</span><br><span class="line">print(<span class="string">&quot;Recall\t\t&#123;:.4f&#125;&quot;</span>.<span class="built_in">format</span>(recall_score(y_train_5, y_train_pred_90)))</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">y_train_pred_90 <span class="token operator">=</span> <span class="token punctuation">(</span>y_scores <span class="token operator">>=</span> threshold_90_precision<span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Precision\t&#123;:.4f&#125;"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>precision_score<span class="token punctuation">(</span>y_train_5<span class="token punctuation">,</span> y_train_pred_90<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Recall\t\t&#123;:.4f&#125;"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>recall_score<span class="token punctuation">(</span>y_train_5<span class="token punctuation">,</span> y_train_pred_90<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <pre><code>Precision    0.9000
 Recall        0.5562
 </code></pre>
@@ -419,11 +496,27 @@ Recall        0.5562
 <p>$$<br>FPR = 1-TNR<br>$$</p>
 <p>所以ROC是sensitivity(recall) vs 1 - specificity – 真阳性/阳性 vs 假阳性/阴性</p>
 <p>下面使用<code>roc_curve()</code>计算不同threshold下的TPR与FPR.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> roc_curve</span><br><span class="line"></span><br><span class="line">fpr, tpr, thresholds = roc_curve(y_train_5, y_scores) <span class="comment"># y_scores: decision value</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">plot_roc_curve</span>(<span class="params">fpr, tpr, label=<span class="literal">None</span></span>):</span></span><br><span class="line">    plt.plot(fpr, tpr, linewidth=<span class="number">2</span>, label=label)</span><br><span class="line">    plt.plot([<span class="number">0</span>, <span class="number">1</span>], [<span class="number">0</span>, <span class="number">1</span>], <span class="string">&#x27;k--&#x27;</span>) <span class="comment"># dashed diagonal</span></span><br><span class="line">    plt.xlim((<span class="number">0</span>,<span class="number">1</span>))</span><br><span class="line">    plt.ylim((<span class="number">0</span>,<span class="number">1</span>))</span><br><span class="line">    plt.grid()</span><br><span class="line">    plt.xlabel(<span class="string">&quot;False Positive Rate&quot;</span>)</span><br><span class="line">    plt.ylabel(<span class="string">&quot;True Positive Rate&quot;</span>)</span><br><span class="line"></span><br><span class="line">plot_roc_curve(fpr, tpr)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>metrics <span class="token keyword">import</span> roc_curve
+
+fpr<span class="token punctuation">,</span> tpr<span class="token punctuation">,</span> thresholds <span class="token operator">=</span> roc_curve<span class="token punctuation">(</span>y_train_5<span class="token punctuation">,</span> y_scores<span class="token punctuation">)</span> <span class="token comment"># y_scores: decision value</span>
+
+<span class="token keyword">def</span> <span class="token function">plot_roc_curve</span><span class="token punctuation">(</span>fpr<span class="token punctuation">,</span> tpr<span class="token punctuation">,</span> label<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    plt<span class="token punctuation">.</span>plot<span class="token punctuation">(</span>fpr<span class="token punctuation">,</span> tpr<span class="token punctuation">,</span> linewidth<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span> label<span class="token operator">=</span>label<span class="token punctuation">)</span>
+    plt<span class="token punctuation">.</span>plot<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">'k--'</span><span class="token punctuation">)</span> <span class="token comment"># dashed diagonal</span>
+    plt<span class="token punctuation">.</span>xlim<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    plt<span class="token punctuation">.</span>ylim<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    plt<span class="token punctuation">.</span>grid<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    plt<span class="token punctuation">.</span>xlabel<span class="token punctuation">(</span><span class="token string">"False Positive Rate"</span><span class="token punctuation">)</span>
+    plt<span class="token punctuation">.</span>ylabel<span class="token punctuation">(</span><span class="token string">"True Positive Rate"</span><span class="token punctuation">)</span>
+
+plot_roc_curve<span class="token punctuation">(</span>fpr<span class="token punctuation">,</span> tpr<span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p><a target="_blank" rel="noopener" href="https://imgtu.com/i/yOZ5TJ"><img src="https://s3.ax1x.com/2021/02/24/yOZ5TJ.png" alt="yOZ5TJ.png"></a></p>
 <p>一个比较方法是比较AUC: area under the curve. 如果classifier是“完美的话”，FPR恒为0，TPR恒为1，AUC面积恒为1；如果classifier是随机的话，FPR = TPR，AUC面积接近0.5. 下面计算AUC。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> roc_auc_score</span><br><span class="line"></span><br><span class="line">print(<span class="string">&quot;AUC: &#123;:.4f&#125;&quot;</span>.<span class="built_in">format</span>(roc_auc_score(y_train_5, y_scores)))</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>metrics <span class="token keyword">import</span> roc_auc_score
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"AUC: &#123;:.4f&#125;"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>roc_auc_score<span class="token punctuation">(</span>y_train_5<span class="token punctuation">,</span> y_scores<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <pre><code>AUC: 0.9604
 </code></pre>
 <p>如何选择Precision/recall (PR) curve或者AUC？</p>
@@ -440,14 +533,15 @@ Recall        0.5562
 </li>
 </ul>
 <h2 id="Multi-class-Classification"><a href="#Multi-class-Classification" class="headerlink" title="Multi-class Classification"></a>Multi-class Classification</h2><p>使用one-vs-one方法进行分类。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sgd_clf.fit(x_train, y_train) <span class="comment"># 对所有类别进行分类</span></span><br><span class="line">sgd_clf.predict([some_digit]) <span class="comment"># 自动进行OvR的分类</span></span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">sgd_clf<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>x_train<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span> <span class="token comment"># 对所有类别进行分类</span>
+sgd_clf<span class="token punctuation">.</span>predict<span class="token punctuation">(</span><span class="token punctuation">[</span>some_digit<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token comment"># 自动进行OvR的分类</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 
 
 <pre><code>array([5])
 </code></pre>
 <p>查看此实例对所有分类的decision value：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sgd_clf.decision_function([some_digit])</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">sgd_clf<span class="token punctuation">.</span>decision_function<span class="token punctuation">(</span><span class="token punctuation">[</span>some_digit<span class="token punctuation">]</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 
 
@@ -457,19 +551,24 @@ Recall        0.5562
          -7748.15499922]])
 </code></pre>
 <p>交叉检验这个classifier的accuracy：分类正确的比例。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cross_val_score(sgd_clf, x_train, y_train, cv=<span class="number">3</span>, scoring=<span class="string">&quot;accuracy&quot;</span>)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">cross_val_score<span class="token punctuation">(</span>sgd_clf<span class="token punctuation">,</span> x_train<span class="token punctuation">,</span> y_train<span class="token punctuation">,</span> cv<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span> scoring<span class="token operator">=</span><span class="token string">"accuracy"</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 
 
 <pre><code>array([0.88775, 0.87555, 0.8795 ])
 </code></pre>
 <p>Scaling the inputs 可以提高accuracy.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> StandardScaler</span><br><span class="line"></span><br><span class="line">scaler = StandardScaler()</span><br><span class="line">x_train_scaled = scaler.fit_transform(x_train.astype(np.float64))</span><br><span class="line"><span class="comment"># cross_val_score(sgd_clf, x_train_scaled, y_train, cv=3, scoring=&quot;accuracy&quot;)</span></span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>preprocessing <span class="token keyword">import</span> StandardScaler
+
+scaler <span class="token operator">=</span> StandardScaler<span class="token punctuation">(</span><span class="token punctuation">)</span>
+x_train_scaled <span class="token operator">=</span> scaler<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>x_train<span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span>float64<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token comment"># cross_val_score(sgd_clf, x_train_scaled, y_train, cv=3, scoring="accuracy")</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h2 id="Error-Analysis"><a href="#Error-Analysis" class="headerlink" title="Error Analysis"></a>Error Analysis</h2><p>假定已经获得一个最好的模型，现在想要提高这个模型。一个方法是分析它所犯的错误。</p>
 <p>首先看它的confusion matrix。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">y_train_pred = cross_val_predict(sgd_clf, x_train, y_train, cv=<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">y_train_pred <span class="token operator">=</span> cross_val_predict<span class="token punctuation">(</span>sgd_clf<span class="token punctuation">,</span> x_train<span class="token punctuation">,</span> y_train<span class="token punctuation">,</span> cv<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">conf_mx = confusion_matrix(y_train, y_train_pred)</span><br><span class="line">conf_mx</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">conf_mx <span class="token operator">=</span> confusion_matrix<span class="token punctuation">(</span>y_train<span class="token punctuation">,</span> y_train_pred<span class="token punctuation">)</span>
+conf_mx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 
 
@@ -486,31 +585,44 @@ Recall        0.5562
       dtype=int64)
 </code></pre>
 <p>利用灰度图可视化confusion matrix.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">plt.matshow(conf_mx, cmap=plt.cm.gray)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">plt<span class="token punctuation">.</span>matshow<span class="token punctuation">(</span>conf_mx<span class="token punctuation">,</span> cmap<span class="token operator">=</span>plt<span class="token punctuation">.</span>cm<span class="token punctuation">.</span>gray<span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <p><a target="_blank" rel="noopener" href="https://imgtu.com/i/yOZWOU"><img src="https://s3.ax1x.com/2021/02/24/yOZWOU.png" alt="yOZWOU.png"></a></p>
 <p>confusion matrix的每个元素都是instance的数量。现在把它标准化为比例。比如第二行第三列为把数字1（行）识别为数字2（列）的比例。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">row_sums = conf_mx.<span class="built_in">sum</span>(axis=<span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">norm_conf_mx = conf_mx / row_sums</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">row_sums <span class="token operator">=</span> conf_mx<span class="token punctuation">.</span><span class="token builtin">sum</span><span class="token punctuation">(</span>axis<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span> keepdims<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+norm_conf_mx <span class="token operator">=</span> conf_mx <span class="token operator">/</span> row_sums<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <p>把对角线元素都变为0，从而突出预测错误的情况。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">np.fill_diagonal(norm_conf_mx, <span class="number">0</span>)</span><br><span class="line">plt.matshow(norm_conf_mx, cmap=plt.cm.gray)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">np<span class="token punctuation">.</span>fill_diagonal<span class="token punctuation">(</span>norm_conf_mx<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>matshow<span class="token punctuation">(</span>norm_conf_mx<span class="token punctuation">,</span> cmap<span class="token operator">=</span>plt<span class="token punctuation">.</span>cm<span class="token punctuation">.</span>gray<span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
 <p><a target="_blank" rel="noopener" href="https://imgtu.com/i/yOZ2lV"><img src="https://s3.ax1x.com/2021/02/24/yOZ2lV.png" alt="yOZ2lV.png"></a></p>
 <p>从图中可以看出，9经常被错误地认为是4，而4则往往能正确被识别出来。一个解决方法是针对性地收集更多“像4的9”，从而更好地训练模型分辨9和4。另外还有其他一些方法。</p>
 <h2 id="Multilabel-Classification"><a href="#Multilabel-Classification" class="headerlink" title="Multilabel Classification"></a>Multilabel Classification</h2><p>指一个实例能分多个类的情况。</p>
 <p>举例：创建一个classifier，给每个数据分配两个标签，第一个是大数与否（7， 8， 9属于大数），第二个是奇数与否。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.neighbors <span class="keyword">import</span> KNeighborsClassifier</span><br><span class="line"></span><br><span class="line">y_train_large = (y_train &gt;= <span class="number">7</span>)</span><br><span class="line">y_train_odd = (y_train % <span class="number">2</span> == <span class="number">1</span>)</span><br><span class="line">y_multilabel = np.c_[y_train_large, y_train_odd]</span><br><span class="line"></span><br><span class="line">knn_clf = KNeighborsClassifier()</span><br><span class="line">knn_clf.fit(x_train, y_multilabel)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>neighbors <span class="token keyword">import</span> KNeighborsClassifier
+
+y_train_large <span class="token operator">=</span> <span class="token punctuation">(</span>y_train <span class="token operator">>=</span> <span class="token number">7</span><span class="token punctuation">)</span>
+y_train_odd <span class="token operator">=</span> <span class="token punctuation">(</span>y_train <span class="token operator">%</span> <span class="token number">2</span> <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span>
+y_multilabel <span class="token operator">=</span> np<span class="token punctuation">.</span>c_<span class="token punctuation">[</span>y_train_large<span class="token punctuation">,</span> y_train_odd<span class="token punctuation">]</span>
+
+knn_clf <span class="token operator">=</span> KNeighborsClassifier<span class="token punctuation">(</span><span class="token punctuation">)</span>
+knn_clf<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>x_train<span class="token punctuation">,</span> y_multilabel<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 
 
 <pre><code>KNeighborsClassifier()
 </code></pre>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">knn_clf.predict([some_digit])</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">knn_clf<span class="token punctuation">.</span>predict<span class="token punctuation">(</span><span class="token punctuation">[</span>some_digit<span class="token punctuation">]</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 
 
 <pre><code>array([[False,  True]])
 </code></pre>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">y_train_knn_pred = cross_val_predict(knn_clf, x_train, y_multilabel, cv=<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">f1_score(y_multilabel, y_train_knn_pred, average=<span class="string">&quot;macro&quot;</span>)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">y_train_knn_pred <span class="token operator">=</span> cross_val_predict<span class="token punctuation">(</span>knn_clf<span class="token punctuation">,</span> x_train<span class="token punctuation">,</span> y_multilabel<span class="token punctuation">,</span> cv<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span>
+
+f1_score<span class="token punctuation">(</span>y_multilabel<span class="token punctuation">,</span> y_train_knn_pred<span class="token punctuation">,</span> average<span class="token operator">=</span><span class="token string">"macro"</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
 
 

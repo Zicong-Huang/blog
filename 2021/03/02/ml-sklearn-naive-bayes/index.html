@@ -271,7 +271,14 @@
 </ul>
 <a id="more"></a>
 
-<h1 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># import required packages</span></span><br><span class="line">%matplotlib inline</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line"><span class="keyword">from</span> sklearn.naive_bayes <span class="keyword">import</span> MultinomialNB</span><br><span class="line"></span><br><span class="line">file_path = <span class="string">&#x27;../big_data2/datasets/FlightDelays.csv&#x27;</span></span><br></pre></td></tr></table></figure>
+<h1 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h1><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment"># import required packages</span>
+<span class="token operator">%</span>matplotlib inline
+
+<span class="token keyword">import</span> pandas <span class="token keyword">as</span> pd
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>model_selection <span class="token keyword">import</span> train_test_split
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>naive_bayes <span class="token keyword">import</span> MultinomialNB
+
+file_path <span class="token operator">=</span> <span class="token string">'../big_data2/datasets/FlightDelays.csv'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h1 id="贝叶斯分类"><a href="#贝叶斯分类" class="headerlink" title="贝叶斯分类"></a>贝叶斯分类</h1><h2 id="贝叶斯定理"><a href="#贝叶斯定理" class="headerlink" title="贝叶斯定理"></a>贝叶斯定理</h2><p>确定一个具有某些特征（$F$）的样本属于某类标签（$L$）的<strong>后验概率</strong>：</p>
 <p>$$<br>\begin{align}<br>P(L_c|F_i) &amp;= \frac{P(F_i|L_c)P(L_c)}{P(F_i)} \<br>&amp;= \frac{P(F_i|L_c)P(L_c)}{\sum_c P(L_c)P(F_i|L_c)}<br>\end{align}<br>$$</p>
 <p>其中，$P(L_c)$的值可以用样本中标签$L_c$的频次来估计。</p>
@@ -290,11 +297,17 @@
 <h2 id="朴素贝叶斯的模型预测"><a href="#朴素贝叶斯的模型预测" class="headerlink" title="朴素贝叶斯的模型预测"></a>朴素贝叶斯的模型预测</h2><p>上文求出了不同标签下特征的分布的参数。利用此参数，可以从分布中推出<strong>条件概率</strong>$P(F_i|L_c)$。利用贝叶斯公式，可以计算出取某种特征$F_i$的样本属于标签$L_c$中的概率$P(L_c|F_i)$。假设有4个分类$c=1,2,3,4$，则我们需要计算出$F_i$对应4个标签的条件概率。从贝叶斯公式可以看出，四个计算的分子是一样的：$P(F_i)$，所以只需要计算它对应每种标签的分子部分，比较其大小，即可决定其分类：</p>
 <p>$$<br>\begin{align}<br>P(F_i|L_c)P(L_c)<br>\end{align}<br>$$</p>
 <h1 id="例子：飞机延误"><a href="#例子：飞机延误" class="headerlink" title="例子：飞机延误"></a>例子：飞机延误</h1><h2 id="变量和导入数据"><a href="#变量和导入数据" class="headerlink" title="变量和导入数据"></a>变量和导入数据</h2><p>解释变量：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Day of week: ------------------- 1 &#x3D; Monday, ..., 7 &#x3D; Sunday</span><br><span class="line">Scheduled departure time: ------ 分为从 6:00am 到 10:00pm 的18个区间</span><br><span class="line">Origin: ------------------------ 出发机场代码</span><br><span class="line">Destination: ------------------- 到达机场代码</span><br><span class="line">Carrier: ----------------------- 航空公司代码</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-none"><code class="language-none">Day of week: ------------------- 1 &#x3D; Monday, ..., 7 &#x3D; Sunday
+Scheduled departure time: ------ 分为从 6:00am 到 10:00pm 的18个区间
+Origin: ------------------------ 出发机场代码
+Destination: ------------------- 到达机场代码
+Carrier: ----------------------- 航空公司代码<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>被解释变量：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Delay:-------------------------- 无延误（0）和延误（1）</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-none"><code class="language-none">Delay:-------------------------- 无延误（0）和延误（1）<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">delays_df = pd.read_csv(file_path)</span><br><span class="line"></span><br><span class="line">delays_df</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">delays_df <span class="token operator">=</span> pd<span class="token punctuation">.</span>read_csv<span class="token punctuation">(</span>file_path<span class="token punctuation">)</span>
+
+delays_df<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
 
 
@@ -517,11 +530,22 @@
 
 
 <h2 id="转换数据"><a href="#转换数据" class="headerlink" title="转换数据"></a>转换数据</h2><p>将日期和飞行状态（ontime, delay）转换为分类变量（categoric variable）.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># convert to categorical</span></span><br><span class="line"></span><br><span class="line">delays_df[<span class="string">&#x27;DAY_WEEK&#x27;</span>] = delays_df[<span class="string">&#x27;DAY_WEEK&#x27;</span>].astype(<span class="string">&#x27;category&#x27;</span>)</span><br><span class="line">delays_df[<span class="string">&#x27;Flight Status&#x27;</span>] = delays_df[<span class="string">&#x27;Flight Status&#x27;</span>].astype(<span class="string">&#x27;category&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment"># convert to categorical</span>
+
+delays_df<span class="token punctuation">[</span><span class="token string">'DAY_WEEK'</span><span class="token punctuation">]</span> <span class="token operator">=</span> delays_df<span class="token punctuation">[</span><span class="token string">'DAY_WEEK'</span><span class="token punctuation">]</span><span class="token punctuation">.</span>astype<span class="token punctuation">(</span><span class="token string">'category'</span><span class="token punctuation">)</span>
+delays_df<span class="token punctuation">[</span><span class="token string">'Flight Status'</span><span class="token punctuation">]</span> <span class="token operator">=</span> delays_df<span class="token punctuation">[</span><span class="token string">'Flight Status'</span><span class="token punctuation">]</span><span class="token punctuation">.</span>astype<span class="token punctuation">(</span><span class="token string">'category'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <p>离散化：将出发时间归类为不同的小时。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># create hourly bins departure time</span></span><br><span class="line"></span><br><span class="line">delays_df[<span class="string">&#x27;CRS_DEP_TIME&#x27;</span>] = [(t // <span class="number">100</span>) <span class="keyword">for</span> t <span class="keyword">in</span> delays_df[<span class="string">&#x27;CRS_DEP_TIME&#x27;</span>]]</span><br><span class="line"></span><br><span class="line">delays_df[<span class="string">&#x27;CRS_DEP_TIME&#x27;</span>] = delays_df[<span class="string">&#x27;CRS_DEP_TIME&#x27;</span>].astype(<span class="string">&#x27;category&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment"># create hourly bins departure time</span>
+
+delays_df<span class="token punctuation">[</span><span class="token string">'CRS_DEP_TIME'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">(</span>t <span class="token operator">//</span> <span class="token number">100</span><span class="token punctuation">)</span> <span class="token keyword">for</span> t <span class="token keyword">in</span> delays_df<span class="token punctuation">[</span><span class="token string">'CRS_DEP_TIME'</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+
+delays_df<span class="token punctuation">[</span><span class="token string">'CRS_DEP_TIME'</span><span class="token punctuation">]</span> <span class="token operator">=</span> delays_df<span class="token punctuation">[</span><span class="token string">'CRS_DEP_TIME'</span><span class="token punctuation">]</span><span class="token punctuation">.</span>astype<span class="token punctuation">(</span><span class="token string">'category'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>提取出解释变量和被解释变量向量</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">predictors = [<span class="string">&#x27;DAY_WEEK&#x27;</span>, <span class="string">&#x27;CRS_DEP_TIME&#x27;</span>, <span class="string">&#x27;ORIGIN&#x27;</span>, <span class="string">&#x27;DEST&#x27;</span>, <span class="string">&#x27;CARRIER&#x27;</span>]</span><br><span class="line">outcome = <span class="string">&#x27;Flight Status&#x27;</span></span><br><span class="line"></span><br><span class="line">x = pd.get_dummies(delays_df[predictors])   <span class="comment"># 对分类变量产生对应的0/1变量（组）</span></span><br><span class="line">x.columns</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">predictors <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'DAY_WEEK'</span><span class="token punctuation">,</span> <span class="token string">'CRS_DEP_TIME'</span><span class="token punctuation">,</span> <span class="token string">'ORIGIN'</span><span class="token punctuation">,</span> <span class="token string">'DEST'</span><span class="token punctuation">,</span> <span class="token string">'CARRIER'</span><span class="token punctuation">]</span>
+outcome <span class="token operator">=</span> <span class="token string">'Flight Status'</span>
+
+x <span class="token operator">=</span> pd<span class="token punctuation">.</span>get_dummies<span class="token punctuation">(</span>delays_df<span class="token punctuation">[</span>predictors<span class="token punctuation">]</span><span class="token punctuation">)</span>   <span class="token comment"># 对分类变量产生对应的0/1变量（组）</span>
+x<span class="token punctuation">.</span>columns<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 
 
@@ -537,10 +561,14 @@
        &#39;CARRIER_UA&#39;, &#39;CARRIER_US&#39;],
       dtype=&#39;object&#39;)
 </code></pre>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">y = delays_df[outcome].astype(<span class="string">&#x27;category&#x27;</span>)  <span class="comment"># 不需要get_dummies因为本身就是0/1的分类变量</span></span><br></pre></td></tr></table></figure>
-<h2 id="划分训练集和测试集"><a href="#划分训练集和测试集" class="headerlink" title="划分训练集和测试集"></a>划分训练集和测试集</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">test_frac = <span class="number">0.4</span></span><br><span class="line"></span><br><span class="line">x_train, x_valid, y_train, y_valid = train_test_split(x, y, test_size=test_frac)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">y <span class="token operator">=</span> delays_df<span class="token punctuation">[</span>outcome<span class="token punctuation">]</span><span class="token punctuation">.</span>astype<span class="token punctuation">(</span><span class="token string">'category'</span><span class="token punctuation">)</span>  <span class="token comment"># 不需要get_dummies因为本身就是0/1的分类变量</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h2 id="划分训练集和测试集"><a href="#划分训练集和测试集" class="headerlink" title="划分训练集和测试集"></a>划分训练集和测试集</h2><pre class="line-numbers language-python" data-language="python"><code class="language-python">test_frac <span class="token operator">=</span> <span class="token number">0.4</span>
+
+x_train<span class="token punctuation">,</span> x_valid<span class="token punctuation">,</span> y_train<span class="token punctuation">,</span> y_valid <span class="token operator">=</span> train_test_split<span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> test_size<span class="token operator">=</span>test_frac<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <h2 id="多项式朴素贝叶斯"><a href="#多项式朴素贝叶斯" class="headerlink" title="多项式朴素贝叶斯"></a>多项式朴素贝叶斯</h2><p>训练模型：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># run naive Bayes</span></span><br><span class="line">delays_nb = MultinomialNB(alpha=<span class="number">0.01</span>)</span><br><span class="line">delays_nb.fit(x_train, y_train)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment"># run naive Bayes</span>
+delays_nb <span class="token operator">=</span> MultinomialNB<span class="token punctuation">(</span>alpha<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">)</span>
+delays_nb<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>x_train<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
 
 
@@ -549,9 +577,18 @@
 <p>这是多项式分布朴素贝叶斯。它假设每个标签中，特征取某个值的数量服从多项式分布。它非常适合用于描述出现次数或者出现次数比例的特征。</p>
 <p>$\alpha$是一个平滑参数。当训练量不足的时候，有些特征的取值可能没在训练集出现过，其概率将被当成是0，带来不合理的问题。平滑参数是用来解决这个问题的。具体细节将另文详述。</p>
 <p>预测训练集/测试集中不延迟/延迟的概率：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># predict probabilities</span></span><br><span class="line">pred_prob_train = delays_nb.predict_proba(x_train)</span><br><span class="line">pred_prob_valid = delays_nb.predict_proba(x_valid)</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment"># predict probabilities</span>
+pred_prob_train <span class="token operator">=</span> delays_nb<span class="token punctuation">.</span>predict_proba<span class="token punctuation">(</span>x_train<span class="token punctuation">)</span>
+pred_prob_valid <span class="token operator">=</span> delays_nb<span class="token punctuation">.</span>predict_proba<span class="token punctuation">(</span>x_valid<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <p>预测训练集/测试集中的分类：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># predict class membership</span></span><br><span class="line">pred_train = delays_nb.predict(x_train)</span><br><span class="line">pred_valid = delays_nb.predict(x_valid)</span><br><span class="line"></span><br><span class="line"><span class="comment"># membership of valid set</span></span><br><span class="line">pred_valid_df = delays_df.iloc[x_valid.index].copy()</span><br><span class="line">pred_valid_df[<span class="string">&#x27;Flight Status Pred&#x27;</span>] = pred_valid</span><br><span class="line">pred_valid_df</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment"># predict class membership</span>
+pred_train <span class="token operator">=</span> delays_nb<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>x_train<span class="token punctuation">)</span>
+pred_valid <span class="token operator">=</span> delays_nb<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>x_valid<span class="token punctuation">)</span>
+
+<span class="token comment"># membership of valid set</span>
+pred_valid_df <span class="token operator">=</span> delays_df<span class="token punctuation">.</span>iloc<span class="token punctuation">[</span>x_valid<span class="token punctuation">.</span>index<span class="token punctuation">]</span><span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+pred_valid_df<span class="token punctuation">[</span><span class="token string">'Flight Status Pred'</span><span class="token punctuation">]</span> <span class="token operator">=</span> pred_valid
+pred_valid_df<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 
 
@@ -786,7 +823,7 @@
 
 
 <h2 id="预测效果"><a href="#预测效果" class="headerlink" title="预测效果"></a>预测效果</h2><p>训练集的预测效果：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classificationSummary(y_train, pred_train, class_names = [<span class="string">&#x27;ontime&#x27;</span>, <span class="string">&#x27;delay&#x27;</span>])</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">classificationSummary<span class="token punctuation">(</span>y_train<span class="token punctuation">,</span> pred_train<span class="token punctuation">,</span> class_names <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'ontime'</span><span class="token punctuation">,</span> <span class="token string">'delay'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <pre><code>Confusion Matrix (Accuracy 0.7833)
 
        Prediction
@@ -795,7 +832,7 @@ ontime     38    230
  delay     56    996
 </code></pre>
 <p>测试集的预测效果：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classificationSummary(y_valid, pred_valid, class_names = [<span class="string">&#x27;ontime&#x27;</span>, <span class="string">&#x27;delay&#x27;</span>])</span><br></pre></td></tr></table></figure>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">classificationSummary<span class="token punctuation">(</span>y_valid<span class="token punctuation">,</span> pred_valid<span class="token punctuation">,</span> class_names <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'ontime'</span><span class="token punctuation">,</span> <span class="token string">'delay'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <pre><code>Confusion Matrix (Accuracy 0.7980)
 
        Prediction
